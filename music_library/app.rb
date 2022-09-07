@@ -4,14 +4,17 @@ require_relative 'lib/album_repository'
 
 DatabaseConnection.connect('music_library')
 
-# artist_repository = ArtistRepository.new
+artist_repository = ArtistRepository.new
 
 # artist_repository.all.each do |record|
 #   p record
 # end
 
-album_repository = AlbumRepository.new
+artist = artist_repository.find(2)
+puts "#{artist.id} - #{artist.name} - #{artist.genre}"
 
-album_repository.all.each do |record|
-  p record.title
-end
+# album_repository = AlbumRepository.new
+
+# album_repository.all.each do |record|
+#   p record.title
+# end
