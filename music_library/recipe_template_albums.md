@@ -68,15 +68,21 @@ class AlbumRepository
   def all
     # Executes the SQL query:
     # SELECT id, title, release_year, arsist_id FROM albums;
-    
+
     # Returns an array of Album objects.
   end
 
   def find(id)
     # Executes the SQL query:
     # SELECT id, title, release_year, artist_id FROM albums WHERE id = $1;
-    
+
     # Returns an Album object.
+  end
+
+  def create(album)
+  # INSERT INTO albums (title, release_year, artist_id) VALUES ($1, $2, $3);
+
+  # returns nil
   end
 end
 ```
@@ -116,6 +122,19 @@ album.title # =>  'Surfer Rosa'
 album.release_year # =>  1988
 album.artist_id # => 1
 
+# 3
+# create a record from Album
+album_repository = AlbumRepository.new
+album = Album.new
+album.title = "New Album Title"
+album.release_year = 2020
+album.artist_id = 2
+repo.create(album)
+result = album_repository.all
+result.length # => 3
+result.last.title # => "New Album Title"
+result.last.release_year # => '2020'
+result.last.artist_id # => '2'
 ```
 
 Encode this example as a test.
@@ -138,7 +157,7 @@ def reset_albums_table
 end
 
 describe ArtistRepository do
-  before(:each) do 
+  before(:each) do
     reset_albums_table
   end
 

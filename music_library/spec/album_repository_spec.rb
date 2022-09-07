@@ -38,4 +38,20 @@ RSpec.describe AlbumRepository do
       expect(album.artist_id).to eq '1'
     end
   end
+
+  describe "#create" do
+    it "creates a new record from Album object" do
+      album_repository = AlbumRepository.new
+      album = Album.new
+      album.title = "New Album Title"
+      album.release_year = 2020
+      album.artist_id = 2
+      album_repository.create(album)
+      result = album_repository.all
+      result.length # => 3
+      result.last.title # => "New Album Title"
+      result.last.release_year # => '2020'
+      result.last.artist_id # => '2'
+    end
+  end
 end
