@@ -11,12 +11,7 @@ Otherwise, [follow this recipe to design and create the SQL schema for your tabl
 *In this template, we'll use an example table `students`*
 
 ```
-# EXAMPLE
 
-Table: students
-
-Columns:
-id | name | cohort_name
 ```
 
 ## 2. Create Test SQL seeds
@@ -26,22 +21,7 @@ Your tests will depend on data stored in PostgreSQL to run.
 If seed data is provided (or you already created it), you can skip this step.
 
 ```sql
--- EXAMPLE
--- (file: spec/seeds_{table_name}.sql)
 
--- Write your SQL seed here. 
-
--- First, you'd need to truncate the table - this is so our table is emptied between each test run,
--- so we can start with a fresh state.
--- (RESTART IDENTITY resets the primary key)
-
-TRUNCATE TABLE students RESTART IDENTITY; -- replace with your own table name.
-
--- Below this line there should only be `INSERT` statements.
--- Replace these statements with your own seed data.
-
-INSERT INTO students (name, cohort_name) VALUES ('David', 'April 2022');
-INSERT INTO students (name, cohort_name) VALUES ('Anna', 'May 2022');
 ```
 
 Run this SQL file on the database to truncate (empty) the table, and insert the seed data. Be mindful of the fact any existing records in the table will be deleted.
@@ -134,15 +114,15 @@ This is so you get a fresh table contents every time you run the test suite.
 
 # file: spec/student_repository_spec.rb
 
-def reset_students_table
-  seed_sql = File.read('spec/seeds_students.sql')
-  connection = PG.connect({ host: '127.0.0.1', dbname: 'students' })
+def reset_albums_table
+  seed_sql = File.read('spec/seeds_albums.sql')
+  connection = PG.connect({ host: '127.0.0.1', dbname: 'music_library_test' })
   connection.exec(seed_sql)
 end
 
-describe StudentRepository do
+describe ArtistRepository do
   before(:each) do 
-    reset_students_table
+    reset_albums_table
   end
 
   # (your tests will go here).

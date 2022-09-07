@@ -21,4 +21,14 @@ RSpec.describe ArtistRepository do
     expect(artists.first.genre).to eq 'Rock'
     expect(artists[1].id).to eq '2'
   end
+
+  describe "#find" do
+    it "returns one Artist object selected by id using parameter" do
+      repo = ArtistRepository.new
+      artist = repo.find(2)
+      expect(artist.id).to eq '2'
+      expect(artist.name).to eq 'ABBA'
+      expect(artist.genre).to eq 'Pop'
+    end
+  end
 end
