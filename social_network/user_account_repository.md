@@ -8,15 +8,15 @@ If the table is already created in the database, you can skip this step.
 
 Otherwise, [follow this recipe to design and create the SQL schema for your table](./single_table_design_recipe_template.md).
 
-*In this template, we'll use an example table `students`*
+*In this template, we'll use an example table ``*
 
 ```
 # EXAMPLE
 
-Table: students
+Table: user_accounts
 
 Columns:
-id | name | cohort_name
+id, email_address, username
 ```
 
 ## 2. Create Test SQL seeds
@@ -26,28 +26,18 @@ Your tests will depend on data stored in PostgreSQL to run.
 If seed data is provided (or you already created it), you can skip this step.
 
 ```sql
--- EXAMPLE
--- (file: spec/seeds_{table_name}.sql)
+TRUNCATE TABLE user_accounts, posts RESTART IDENTITY;
 
--- Write your SQL seed here. 
-
--- First, you'd need to truncate the table - this is so our table is emptied between each test run,
--- so we can start with a fresh state.
--- (RESTART IDENTITY resets the primary key)
-
-TRUNCATE TABLE students RESTART IDENTITY; -- replace with your own table name.
-
--- Below this line there should only be `INSERT` statements.
--- Replace these statements with your own seed data.
-
-INSERT INTO students (name, cohort_name) VALUES ('David', 'April 2022');
-INSERT INTO students (name, cohort_name) VALUES ('Anna', 'May 2022');
+INSERT INTO user_accounts (email_address, username)
+  VALUES ('user1@gmail.com', 'username1');
+INSERT INTO user_accounts (email_address, username)
+  VALUES ('user2@gmail.com', 'username2');
 ```
 
 Run this SQL file on the database to truncate (empty) the table, and insert the seed data. Be mindful of the fact any existing records in the table will be deleted.
 
 ```bash
-psql -h 127.0.0.1 your_database_name < seeds_{table_name}.sql
+psql -h localhost social_network_test < spec/seeds_user_accounts.sql
 ```
 
 ## 3. Define the class names
@@ -55,17 +45,12 @@ psql -h 127.0.0.1 your_database_name < seeds_{table_name}.sql
 Usually, the Model class name will be the capitalised table name (single instead of plural). The same name is then suffixed by `Repository` for the Repository class name.
 
 ```ruby
-# EXAMPLE
-# Table name: students
-
-# Model class
-# (in lib/student.rb)
-class Student
+class UserAccount
+  
 end
 
-# Repository class
-# (in lib/student_repository.rb)
-class StudentRepository
+class UserAccountRepository
+  
 end
 ```
 
@@ -74,25 +59,9 @@ end
 Define the attributes of your Model class. You can usually map the table columns to the attributes of the class, including primary and foreign keys.
 
 ```ruby
-# EXAMPLE
-# Table name: students
-
-# Model class
-# (in lib/student.rb)
-
-class Student
-
-  # Replace the attributes by your own columns.
-  attr_accessor :id, :name, :cohort_name
+class UserAccount
+  attr_accessor :id, :email_address, :username
 end
-
-# The keyword attr_accessor is a special Ruby feature
-# which allows us to set and get attributes on an object,
-# here's an example:
-#
-# student = Student.new
-# student.name = 'Jo'
-# student.name
 ```
 
 *You may choose to test-drive this class, but unless it contains any more logic than the example above, it is probably not needed.*
@@ -105,41 +74,41 @@ Using comments, define the method signatures (arguments and return value) and wh
 
 ```ruby
 # EXAMPLE
-# Table name: students
+# Table name: user_accounts
 
 # Repository class
-# (in lib/student_repository.rb)
+# (in lib/user_account_repository.rb)
 
-class StudentRepository
+class UserAccountRepository
 
   # Selecting all records
   # No arguments
   def all
     # Executes the SQL query:
-    # SELECT id, name, cohort_name FROM students;
+    # SELECT id, email_address, username FROM user_accounts;
 
-    # Returns an array of Student objects.
+    # Returns an array of UserAccount objects.
   end
 
   # Gets a single record by its ID
   # One argument: the id (number)
   def find(id)
     # Executes the SQL query:
-    # SELECT id, name, cohort_name FROM students WHERE id = $1;
+    # SELECT id, email_address, username FROM user_accounts WHERE id = $1;
 
-    # Returns a single Student object.
+    # Returns a single UserAccount object.
   end
 
   # Add more methods below for each operation you'd like to implement.
 
-  # def create(student)
+  def create(user_account)
+  end
+
+  # def update(user_account) SKIP
   # end
 
-  # def update(student)
-  # end
-
-  # def delete(student)
-  # end
+  def delete(user_account)
+  end
 end
 ```
 
@@ -150,37 +119,43 @@ Write Ruby code that defines the expected behaviour of the Repository class, fol
 These examples will later be encoded as RSpec tests.
 
 ```ruby
-# EXAMPLES
-
 # 1
-# Get all students
-
-repo = StudentRepository.new
-
-students = repo.all
-
-students.length # =>  2
-
-students[0].id # =>  1
-students[0].name # =>  'David'
-students[0].cohort_name # =>  'April 2022'
-
-students[1].id # =>  2
-students[1].name # =>  'Anna'
-students[1].cohort_name # =>  'May 2022'
+# get all user accounts
+user_account_repository = UserAccountRepository.new
+user_accounts = user_account_repository.all
+user_accounts.length # => 2
+user_accounts.first.id # => 1
+user_accounts.first.email_address # => 'user1@gmail.com'
+user_accounts.first.username # => 'username1'
+user_accounts[1].id # => 2
+user_accounts[1].email_address # => 'user2@gmail.com'
+user_accounts[1].username # => 'username2'
 
 # 2
 # Get a single student
+user_account_repository = UserAccountRepository.new
+user_account = user_account_repository.find(1)
+user_account.id # => 1
+user_account.email_address # => 'user1@gmail.com'
+user_account.username # => 'username1'
 
-repo = StudentRepository.new
+# 3
+# creates a record from UserAccount object
+user_account_repository = UserAccountRepository.new
+user_account = UserAccount.new
+user_account.email_address = 'user99@gmail.com'
+user_account.username = 'username99'
+user_account_repository.create(user_account)
 
-student = repo.find(1)
-
-student.id # =>  1
-student.name # =>  'David'
-student.cohort_name # =>  'April 2022'
-
-# Add more examples for each method
+# 4
+# deletes a record from the database, selected by id
+user_account_repository = UserAccountRepository.new
+user_account_repository.delete(1)
+user_accounts = user_account_repository.all
+user_accounts.length # => 1
+user_accounts.first.id # => 2
+user_accounts.first.email_address # => 'user2@gmail.com'
+user_accounts.first.username # => 'username2'
 ```
 
 Encode this example as a test.
