@@ -31,4 +31,14 @@ RSpec.describe ArtistRepository do
       expect(artist.genre).to eq 'Pop'
     end
   end
+
+  describe "#find_with_albums(id)" do
+    it 'finds artist 1 with related albums' do
+      repository = ArtistRepository.new
+      artist = repository.find_with_albums(1)
+
+      expect(artist.name).to eq('Pixies')
+      expect(artist.albums.length).to eq(2)
+    end
+  end
 end

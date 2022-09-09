@@ -32,7 +32,6 @@ class Application
           albums_string << " * #{album.id} - #{album.title}\n"
         end
         @terminal.puts albums_string
-        # Kernel.puts albums_string
     elsif choice == "2"
       @terminal.puts "Here is the list of artists:"
       artists_string = ""
